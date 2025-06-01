@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hue of pH</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f0f0; transition: background-color 0.5s ease;
+            background-attachment: fixed;
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 80px;
+            width: 500px;
+            text-align: center;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        input {
+            padding: 16px;
+            margin: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            width: 80%;
+            font-size: 1.1em;
+            transition: box-shadow 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #6200ea;
+        }
+        button {
+            padding: 16px 28px;
+            margin: 12px;
+            background-color: #6200ea;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        button:hover {
+            background-color: #3700b3;
+            transform: translateY(-3px);
+        }
+        .result {
+            margin-top: 24px;
+            padding: 24px;
+            border-radius: 10px;
+            font-size: 1.4em;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .show-result {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    .ph-scale { margin-top: 50px;
+            height: 20px;
+            width: 100%;
+            background: linear-gradient(to right, red, orange, yellow, green, cyan, blue, purple);
+            border-radius: 10px;
+        }
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="font-size: 2.8em; color: #333; font-weight: 700; margin-bottom: 20px; font-family: 'Arial', sans-serif;">Hue of pH</h2>
+        <input type="number" id="phValue" placeholder="Enter pH value (0-14)" min="0" max="14">
+        <button onclick="predictColor()">Predict Color</button>
+        <div class="ph-scale"></div>
+        <div class="scale-labels">
+            <span>0 (Strong Acid)</span>
+            <span>7 (Neutral)</span>
+            <span>14 (Strong Base)</span>
+        </div>
+        <div class="result" id="result">Color will be shown here</div>
+    </div>
+
+    <script>
+        function playBeep(frequency, duration = 0.5) {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            oscillator.type = "sine";
+            oscillator.frequency.setValueAtTime(frequency, context.currentTime);
+            const gainNode = context.createGain();
+            gainNode.gain.setValueAtTime(0.5, context.currentTime); 
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
+            oscillator.start();
+            oscillator.stop(context.currentTime + duration);
+        }
+
+        function predictColor() {
+            const ph = parseFloat(document.getElementById("phValue").value);
+            let color = ""; let bgColor = "";
+
+            if (ph < 0 || ph > 14 || isNaN(ph)) {
+                color = "Invalid pH value";
+                playBeep(1200, 0.5);
+            } else if (ph < 1) { color = "Dark Red (Very Strong Acid)"; bgColor = "darkred"; }
+else if (ph < 3) { color = "Red (Strong Acid)"; bgColor = "red";
+                playBeep(400, 0.7);
+            } else if (ph < 4) { color = "Reddish-Orange (Moderate Acid)"; bgColor = "orangered"; }
+else if (ph < 6) { color = "Orange (Weak Acid)"; bgColor = "orange";
+                playBeep(700, 0.7);
+            } else if (ph === 7) {
+                color = "Green (Neutral)"; bgColor = "green";
+                playBeep(550, 0.7);
+            } else if (ph < 8) { color = "Bluish-Green (Moderate Base)"; bgColor = "deepskyblue"; }
+else if (ph < 9) { color = "Blue-Green (Weak Base)"; bgColor = "blue";
+                playBeep(500, 0.7);
+            } else if (ph < 12) { color = "Blue-Violet (Strong Base)"; bgColor = "blueviolet"; }
+else { color = "Purple (Very Strong Base)"; bgColor = "purple";
+                playBeep(1000, 0.7);
+            }
+
+            const resultDiv = document.getElementById("result");
+            resultDiv.textContent = color;
+            const body = document.body;
+            const gradientColors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#8b00ff'];
+            const gradientIndex = Math.min(Math.max(Math.round(ph / 2), 0), gradientColors.length - 1);
+            
+            resultDiv.style.backgroundColor = color.includes("Invalid") ? "#f44336" : bgColor;
+            resultDiv.style.color = "#fff";
+            resultDiv.classList.add("show-result");
+        }
+    </script>
+</body>
+</html>
